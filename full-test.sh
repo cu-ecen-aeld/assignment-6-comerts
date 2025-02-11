@@ -4,7 +4,7 @@
 # steps described in https://github.com/cu-ecen-5013/assignment-autotest/blob/master/README.md#running-tests
 set -e
 
-export SKIP_BUILD=1
+#export SKIP_BUILD=1
 
 cd `dirname $0`
 test_dir=`pwd`

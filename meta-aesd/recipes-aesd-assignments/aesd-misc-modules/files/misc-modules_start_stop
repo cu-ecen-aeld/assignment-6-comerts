@@ -1,0 +1,55 @@
+#! /bin/sh
+
+
+case "$1" in
+    start)
+        #Loading faulty module
+        module="faulty"
+        device="faulty"
+        mode="664"
+        insmod /lib/modules/"$(uname -r)"/extra/$module.ko || exit 1
+        echo "Get the major number (allocated with allocate_chrdev_region) from /proc/devices"
+        major=$(awk "\$2==\"$module\" {print \$1}" /proc/devices)
+        if [ ! -z ${major} ]; then
+            rm -f /dev/${device}
+            mknod /dev/${device} c $major 0
+            chgrp $group /dev/${device}
+            chmod $mode  /dev/${device}
+        fi
+
+        #Loading hello module
+        module="hello"
+        device="hello"
+        mode="664"
+        insmod /lib/modules/"$(uname -r)"/extra/$module.ko || exit 1
+        echo "Get the major number (allocated with allocate_chrdev_region) from /proc/devices"
+        major=$(awk "\$2==\"$module\" {print \$1}" /proc/devices)
+        if [ ! -z ${major} ]; then
+            rm -f /dev/${device}
+            mknod /dev/${device} c $major 0
+            chgrp $group /dev/${device}
+            chmod $mode  /dev/${device}
+        fi
+
+
+        ;;
+    stop)
+        # Remove faulty driver
+        module="faulty"
+        device="faulty"
+        rmmod $module || exit 1
+        rm -f /dev/${device}
+        
+        # Remove hello module
+        module="hello"
+        device="hello"
+        rmmod $module || exit 1
+        rm -f /dev/${device}
+
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+    exit 1
+esac
+
+exit 0

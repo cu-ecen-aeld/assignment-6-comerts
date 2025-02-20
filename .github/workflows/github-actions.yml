@@ -13,9 +13,9 @@ jobs:
 #            with:
 #              clean: false
 #              submodules: 'recursive'
-          - uses: webfactory/ssh-agent@v0.5.4
-            with:
-                 ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          - uses: webfactory/ssh-agent@v0.5.4
+#            with:
+#                 ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 #          - name: Run build
 #            timeout-minutes: 600
 #            run: |
@@ -26,15 +26,27 @@ jobs:
 #                 cuaesd/aesd-autotest:24-assignment6-yocto \
 #                 --workdir=${GITHUB_WORKSPACE} \
 #                 ./build.sh
+#          - name: Cleanup
+#            if: always()
+#            run: |
+#              ssh-add -D
+#          - name: Run full test
+#            timeout-minutes: 15
+#            run: |
+#               docker run --rm \
+#                 -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
+#                 cuaesd/aesd-autotest:assignment6-yocto \
+#                 --workdir=${GITHUB_WORKSPACE} \
+#                 ./full-test.sh
+          - uses: webfactory/ssh-agent@v0.5.3
+            with:
+              ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          - name: Run full test
+            env:
+              GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
+            run: ./full-test.sh
           - name: Cleanup
             if: always()
             run: |
               ssh-add -D
-          - name: Run full test
-            timeout-minutes: 15
-            run: |
-               docker run --rm \
-                 -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
-                 cuaesd/aesd-autotest:assignment6-yocto \
-                 --workdir=${GITHUB_WORKSPACE} \
-                 ./full-test.sh
+
